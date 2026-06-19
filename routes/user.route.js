@@ -1,6 +1,6 @@
 const express = require('express');
 const { inscription, connexion, getProfil } = require('../controllers/user.controller');
-const auth = require('../middleware/user.middleware'); // ✅ ajouté
+const auth = require('../middleware/user.middleware'); 
 
 const router = express.Router();
 

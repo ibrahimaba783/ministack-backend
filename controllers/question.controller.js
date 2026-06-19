@@ -78,7 +78,7 @@ exports.voterQuestion = async (req, res) => {
             return res.status(404).json({ message: "Question introuvable" });
         }
         question.votes += type === 'up' ? 1 : -1; 
-        await question.save(); n
+        await question.save();
         res.json({ message: "Vote enregistré", votes: question.votes });
     } catch (error) {
         res.status(500).json(error);
