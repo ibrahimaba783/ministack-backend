@@ -34,3 +34,6 @@ app.use('/api/reponses', reponseRoute);
 
 // commentaires
 app.use('/api/commentaires', commentaireRoute);
+
+// rend les photos accessibles
+app.use('/uploads', express.static('uploads')); 

@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema(
         type : String,
         required : true
        
+    },
+    photo : {
+        type : String,
+        default : ''
     }
  },
 
@@ -27,4 +31,4 @@ const userSchema = new mongoose.Schema(
 
 );
 
-module.exports = mongoose.model('User' , userSchema);        
+module.exports = mongoose.model('User' , userSchema);

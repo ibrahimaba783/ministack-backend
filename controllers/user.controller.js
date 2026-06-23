@@ -77,4 +77,24 @@ exports.getProfil = async (req, res) => {
         res.status(500).json(error);
         console.log(error);
     }
+
+};
+
+// uploader une photo de profil
+exports.uploadPhoto = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "Aucun fichier envoyé" });
+        }
+        const photoUrl = `/uploads/${req.file.filename}`;
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { photo: photoUrl },
+            { new: true }
+        ).select('-password');
+        res.json({ message: "Photo mise à jour", user });
+    } catch (error) {
+        res.status(500).json(error);
+        console.log(error);
+    }
 };
