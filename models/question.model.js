@@ -7,6 +7,7 @@ const questionSchema = new mongoose.Schema(
         tags: [{ type: String }],
         auteur: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
         votes: { type: Number, default: 0 },
+        vues: { type: Number, default: 0 },
         resolu: { type: Boolean, default: false },
     },
     { timestamps: true }

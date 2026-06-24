@@ -57,10 +57,14 @@ exports.listeQuestions = async (req, res) => {
 // detail d'une question
 exports.detailQuestion = async (req, res) => {
     try {
-        const question = await Question.findById(req.params.id) 
-            .populate('auteur', 'prenom nom'); 
+        const question = await Question.findByIdAndUpdate(
+            req.params.id,
+            { $inc: { vues: 1 } },
+            { new: true }
+        ).populate('auteur', 'prenom nom');
+
         if (!question) {
-            return res.status(404).json({ message: "Question introuvable" }); 
+            return res.status(404).json({ message: "Question introuvable" });
         }
         res.json(question);
     } catch (error) {
