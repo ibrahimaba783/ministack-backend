@@ -98,3 +98,18 @@ exports.uploadPhoto = async (req, res) => {
         console.log(error);
     }
 };
+
+// supprimer la photo de profil
+exports.supprimerPhoto = async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { photo: '' },
+            { new: true }
+        ).select('-password');
+        res.json({ message: "Photo supprimée", user });
+    } catch (error) {
+        res.status(500).json(error);
+        console.log(error);
+    }
+};
