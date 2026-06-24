@@ -86,10 +86,45 @@ exports.voterQuestion = async (req, res) => {
     }
 };
 
+// modifier une question
+exports.modifierQuestion = async (req, res) => {
+    try {
+        const { titre, description, tags } = req.body;
+        const question = await Question.findById(req.params.id);
+
+        if (!question) {
+            return res.status(404).json({ message: "Question introuvable" });
+        }
+
+        if (question.auteur.toString() !== req.user.id) {
+            return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier cette question" });
+        }
+
+        question.titre = titre;
+        question.description = description;
+        question.tags = tags;
+        await question.save();
+
+        res.json({ message: "Question modifiée", question });
+    } catch (error) {
+        res.status(500).json(error);
+        console.log(error);
+    }
+};
+
 // supprimer une question
 exports.supprimerQuestion = async (req, res) => {
     try {
-        await Question.findByIdAndDelete(req.params.id); 
+        const question = await Question.findById(req.params.id);
+        if (!question) {
+            return res.status(404).json({ message: "Question introuvable" });
+        }
+
+        if (question.auteur.toString() !== req.user.id) {
+            return res.status(403).json({ message: "Vous n'êtes pas autorisé à supprimer cette question" });
+        }
+
+        await Question.findByIdAndDelete(req.params.id);
         res.json({ message: "Question supprimée" });
     } catch (error) {
         res.status(500).json(error);
