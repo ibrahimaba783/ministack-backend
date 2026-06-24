@@ -1,5 +1,5 @@
 const express = require('express');
-const { inscription, connexion, getProfil } = require('../controllers/user.controller');
+const { inscription, connexion, getProfil, uploadPhoto } = require('../controllers/user.controller');
 const auth = require('../middleware/user.middleware'); 
 const upload = require('../middleware/upload.middleware');
 
