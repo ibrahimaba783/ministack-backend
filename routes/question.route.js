@@ -8,7 +8,6 @@ router.get('/', listeQuestions);
 router.get('/:id', detailQuestion);
 router.post('/', auth, creerQuestion);
 router.put('/:id/voter', auth, voterQuestion);
-router.delete('/:id', auth, supprimerQuestion);
 router.put('/:id', auth, modifierQuestion);
 router.delete('/:id', auth, supprimerQuestion);
 
