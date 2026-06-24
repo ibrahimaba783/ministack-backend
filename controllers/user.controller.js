@@ -86,10 +86,9 @@ exports.uploadPhoto = async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ message: "Aucun fichier envoyé" });
         }
-        const photoUrl = `/uploads/${req.file.filename}`;
         const user = await User.findByIdAndUpdate(
             req.user.id,
-            { photo: photoUrl },
+            { photo: req.file.path }, // url complete cloudinary
             { new: true }
         ).select('-password');
         res.json({ message: "Photo mise à jour", user });
