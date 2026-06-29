@@ -113,3 +113,55 @@ exports.supprimerPhoto = async (req, res) => {
     }
 };
 
+// modifier les infos du profil (prenom, nom, email)
+exports.modifierProfil = async (req, res) => {
+    try {
+        const { prenom, nom, email } = req.body;
+
+        // si l'email change, verifier qu'il n'est pas deja utilise par quelqu'un d'autre
+        if (email) {
+            const emailExistant = await User.findOne({ email, _id: { $ne: req.user.id } });
+            if (emailExistant) {
+                return res.status(400).json({ message: "Cet email est déjà utilisé" });
+            }
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { prenom, nom, email },
+            { new: true }
+        ).select('-password');
+
+        res.json({ message: "Profil mis à jour", user });
+    } catch (error) {
+        res.status(500).json(error);
+        console.log(error);
+    }
+};
+
+// changer le mot de passe
+exports.changerMotDePasse = async (req, res) => {
+    try {
+        const { ancienMotDePasse, nouveauMotDePasse } = req.body;
+
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur introuvable" });
+        }
+
+        // verifier l'ancien mot de passe avant d'autoriser le changement
+        const correspond = await bcrypt.compare(ancienMotDePasse, user.password);
+        if (!correspond) {
+            return res.status(400).json({ message: "Ancien mot de passe incorrect" });
+        }
+
+        const verifier = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(nouveauMotDePasse, verifier);
+        await user.save();
+
+        res.json({ message: "Mot de passe modifié avec succès" });
+    } catch (error) {
+        res.status(500).json(error);
+        console.log(error);
+    }
+};
