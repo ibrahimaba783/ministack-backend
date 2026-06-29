@@ -20,21 +20,20 @@ exports.creerQuestion = async (req, res) => {
 };
 
 // liste des questions
-// supporte le filtrage par tag, par recherche texte sur le titre, et le tri (recent / votes / non resolus)
 exports.listeQuestions = async (req, res) => {
     try {
         const { tri, tag, recherche } = req.query; 
         let filtre = {}; 
 
         if (tag) filtre.tags = tag; 
-        if (recherche) filtre.titre = { $regex: recherche, $options: 'i' }; // recherche insensible a la casse
+        if (recherche) filtre.titre = { $regex: recherche, $options: 'i' }; 
 
-        let sort = { createdAt: -1 }; // par defaut : les plus recentes en premier
-        if (tri === 'votes') sort = { votes: -1 }; // ou les plus votees en premier
+        let sort = { createdAt: -1 }; 
+        if (tri === 'votes') sort = { votes: -1 }; 
 
         const questions = await Question.find(filtre)
             .sort(sort)
-            .populate('auteur', 'prenom nom'); // remplace l'id auteur par ses infos (prenom, nom)
+            .populate('auteur', 'prenom nom'); 
 
         const questionsAvecReponses = await Promise.all(
             questions.map(async (question) => {
@@ -56,15 +55,12 @@ exports.listeQuestions = async (req, res) => {
 };
 
 // detail d'une question
-// chaque consultation incremente le compteur de vues
 exports.detailQuestion = async (req, res) => {
     try {
-        // findByIdAndUpdate + $inc : incremente la vue directement en base de donnees
-        // (plus fiable que find() + save() si plusieurs personnes consultent en meme temps)
         const question = await Question.findByIdAndUpdate(
             req.params.id,
-            { $inc: { vues: 1 } }, // +1 vue a chaque consultation
-            { new: true } // renvoie le document mis a jour (avec la nouvelle valeur de vues)
+            { $inc: { vues: 1 } },
+            { new: true }
         ).populate('auteur', 'prenom nom');
 
         if (!question) {
@@ -78,7 +74,6 @@ exports.detailQuestion = async (req, res) => {
 };
 
 // voter pour une question
-// type "up" ajoute 1 vote, n'importe quelle autre valeur en retire 1
 exports.voterQuestion = async (req, res) => {
     try {
         const { type } = req.body; 
@@ -96,7 +91,6 @@ exports.voterQuestion = async (req, res) => {
 };
 
 // modifier une question
-// seul l'auteur de la question peut la modifier
 exports.modifierQuestion = async (req, res) => {
     try {
         const { titre, description, tags } = req.body;
@@ -106,8 +100,6 @@ exports.modifierQuestion = async (req, res) => {
             return res.status(404).json({ message: "Question introuvable" });
         }
 
-        // verification de securite : on compare l'auteur de la question (ObjectId -> string)
-        // avec l'id de l'utilisateur connecte (recupere depuis le token JWT)
         if (question.auteur.toString() !== req.user.id) {
             return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier cette question" });
         }
@@ -125,7 +117,6 @@ exports.modifierQuestion = async (req, res) => {
 };
 
 // supprimer une question
-// seul l'auteur de la question peut la supprimer (meme verification que modifierQuestion)
 exports.supprimerQuestion = async (req, res) => {
     try {
         const question = await Question.findById(req.params.id);
@@ -133,7 +124,6 @@ exports.supprimerQuestion = async (req, res) => {
             return res.status(404).json({ message: "Question introuvable" });
         }
 
-        // verification de securite : empeche un utilisateur de supprimer la question d'un autre
         if (question.auteur.toString() !== req.user.id) {
             return res.status(403).json({ message: "Vous n'êtes pas autorisé à supprimer cette question" });
         }
