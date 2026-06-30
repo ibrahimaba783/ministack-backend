@@ -88,7 +88,7 @@ exports.uploadPhoto = async (req, res) => {
         }
         const user = await User.findByIdAndUpdate(
             req.user.id,
-            { photo: req.file.path }, // url complete cloudinary
+            { photo: req.file.path }, 
             { new: true }
         ).select('-password');
         res.json({ message: "Photo mise à jour", user });

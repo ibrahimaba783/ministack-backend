@@ -74,3 +74,27 @@ exports.supprimerReponse = async (req, res) => {
         console.log(error);
     }
 };
+
+// modifier une reponse (seulement par l'auteur)
+exports.modifierReponse = async (req, res) => {
+    try {
+        const { contenu } = req.body;
+        const reponse = await Reponse.findById(req.params.id);
+
+        if (!reponse) {
+            return res.status(404).json({ message: "Réponse introuvable" });
+        }
+
+        if (reponse.auteur.toString() !== req.user.id) {
+            return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier cette réponse" });
+        }
+
+        reponse.contenu = contenu;
+        await reponse.save();
+
+        res.json({ message: "Réponse modifiée", reponse });
+    } catch (error) {
+        res.status(500).json(error);
+        console.log(error);
+    }
+};
