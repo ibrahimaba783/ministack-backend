@@ -55,17 +55,25 @@ exports.listeQuestions = async (req, res) => {
 };
 
 // detail d'une question
+// les vues ne comptent pas si c'est l'auteur qui consulte
 exports.detailQuestion = async (req, res) => {
     try {
-        const question = await Question.findByIdAndUpdate(
-            req.params.id,
-            { $inc: { vues: 1 } },
-            { new: true }
-        ).populate('auteur', 'prenom nom');
+        const question = await Question.findById(req.params.id)
+            .populate('auteur', 'prenom nom');
 
         if (!question) {
             return res.status(404).json({ message: "Question introuvable" });
         }
+
+        // incrementer seulement si ce n'est pas l'auteur
+        const userId = req.user?.id;
+        const estAuteur = userId && question.auteur._id.toString() === userId;
+
+        if (!estAuteur) {
+            await Question.findByIdAndUpdate(req.params.id, { $inc: { vues: 1 } });
+            question.vues = (question.vues || 0) + 1;
+        }
+
         res.json(question);
     } catch (error) {
         res.status(500).json(error);
