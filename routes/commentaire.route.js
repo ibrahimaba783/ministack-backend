@@ -4,7 +4,10 @@ const auth = require('../middleware/user.middleware');
 
 const router = express.Router();
 
+
+router.get('/:reponseId', getCommentaires);
 router.post('/:reponseId', auth, ajouterCommentaire);
 router.delete('/:id', auth, supprimerCommentaire);
+
 
 module.exports = router;

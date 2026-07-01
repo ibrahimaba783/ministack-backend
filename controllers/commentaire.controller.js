@@ -27,3 +27,15 @@ exports.supprimerCommentaire = async (req, res) => {
         console.log(error);
     }
 };
+
+// recuperer les commentaires d'une reponse
+exports.getCommentaires = async (req, res) => {
+    try {
+        const commentaires = await Commentaire.find({ reponse: req.params.reponseId })
+            .populate('auteur', 'prenom nom');
+        res.json(commentaires);
+    } catch (error) {
+        res.status(500).json(error);
+        console.log(error);
+    }
+};
